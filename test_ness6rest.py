@@ -28,6 +28,7 @@
 
 import os
 import ness6rest as nessrest
+import credentials
 
 def test_deduplicate_hosts():
     login = os.getenv("NESSUS_USER")
@@ -46,3 +47,12 @@ def test_deduplicate_hosts():
          {'hostname': 'host1', 'host_id': '1'}]
 
     assert scan._deduplicate_hosts(hosts=[]) == []
+
+def test_SSH_Cisco_escalation():
+    cred = credentials.SSH(username="admin", password="pass", elevate_privileges_with="Cisco 'enable'", escalation_password="pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': "Cisco 'enable'",
+                             'escalation_password': 'pass2',
+                             'password': 'pass',
+                             'username': 'admin'}

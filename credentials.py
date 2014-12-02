@@ -1,4 +1,7 @@
-class Windows:
+class WindowsPassword:
+    '''
+    Username and password for a Windows target.
+    '''
     category = "Host"
     name = "Windows"
 
@@ -9,6 +12,11 @@ class Windows:
         self.auth_method = auth_method
 
 class Ssh:
+    '''
+    Does not provide complete credential information on its own. Create one of
+    its subclasses instead. The privilege escalation functions can be used on
+    any subclass.
+    '''
     category = "Host"
     name = "SSH"
 
@@ -27,6 +35,9 @@ class Ssh:
         return self
 
 class SshPassword(Ssh):
+    '''
+    Username and password for an SSH login.
+    '''
     def __init__(self, username, password):
         super(SshPassword, self).__init__()
         self.auth_method = "password"
@@ -34,6 +45,9 @@ class SshPassword(Ssh):
         self.password = password
 
 class SshPublicKey(Ssh):
+    '''
+    SSH certificate login. The private key must have been uploaded already.
+    '''
     def __init__(self, username, private_key_filename, private_key_passphrase):
         super(SshPublicKey, self).__init__()
         self.auth_method = "public key"
@@ -42,6 +56,10 @@ class SshPublicKey(Ssh):
         self.private_key_passphrase = private_key_passphrase
 
 class SshUserCert(SshPublicKey):
+    '''
+    SSH client certificate login. The private key and user cert must have been
+    uploaded already.
+    '''
     def __init__(self, username, user_cert_filename, private_key_filename,
                  private_key_passphrase):
         self.user_cert = user_cert_filename
@@ -51,6 +69,9 @@ class SshUserCert(SshPublicKey):
                       private_key_passphrase=private_key_passphrase)
 
 class Salesforce:
+    '''
+    Username and password for Salesforce.com.
+    '''
     category = "Cloud Services"
     name = "Salesforce.com"
 
@@ -59,6 +80,9 @@ class Salesforce:
         self.password = password
 
 class PaloAltoPANOS:
+    '''
+    Username and password for a Palo Alto PAN-OS device through the web API.
+    '''
     category = "Miscellaneous"
     name = "Palo Alto Networks PAN-OS"
 

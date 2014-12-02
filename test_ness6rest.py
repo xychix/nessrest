@@ -61,6 +61,34 @@ def test_SSH_Cisco_escalation():
     assert cred.category == "Host"
     assert cred.name == "SSH"
 
+def test_SSH_sudo_escalation_default_account():
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .sudo("pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'sudo',
+                             'escalation_password': 'pass2',
+                             'escalation_account': 'root',
+                             'password': 'pass',
+                             'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_sudo_escalation():
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .sudo(username="nessus", password="pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'sudo',
+                             'escalation_password': 'pass2',
+                             'escalation_account': 'nessus',
+                             'password': 'pass',
+                             'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
 def test_SSH_password():
     cred = credentials.SshPassword(username="admin",
                            password="pass")

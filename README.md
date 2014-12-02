@@ -71,10 +71,16 @@
 ### Suggested installation:
 
 * Find the path to your "site-packages" with: `python -c "import sys; print(sys.path)"`
-* Symlink `nessrest.py` in the Git repo in the "site-packages" directory.
-* Symlink `ness6rest.py` in the Git repo in the "site-packages" directory.
-* Test by issuing `import nessrest` and `import ness6rest` inside the Python interactive
+* Symlink `ness6rest.py` in the Git repo in the "site-packages" or "dist-packages" directory.
+* Test by issuing `import ness6rest` inside the Python interactive
   interperter.
+
+### InsecureRequestWarning
+
+If you're running Nessus with a self-signed certificate, and you wish to squelch the InsecureRequestWarnings that the requests library uses, you can add the following line after the import requests line in ness6rest.py:
+`requests.packages.urllib3.disable_warnings()`
+
+This will disable invalid cerficate warnings and should be used with caution.
 
 ### Configuration file:
 

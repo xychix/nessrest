@@ -8,36 +8,45 @@ class Windows:
         self.domain = domain
         self.auth_method = auth_method
 
-class SSH:
+class Ssh:
     category = "Host"
     name = "SSH"
 
-    def __init__(self, username, password="", auth_method="password", elevate_privileges_with="Nothing", escalation_account="", escalation_password="", private_key_filename="", private_key_passphrase="", user_cert_filename=""):
-        if auth_method not in ("password", "certificate", "Kerberos", "public key"):
-            raise ValueError('auth_method not valid')
+    def __init__(self):
+        self.elevate_privileges_with = "Nothing"
 
-        self.auth_method = auth_method
-        self.elevate_privileges_with = elevate_privileges_with
+    def cisco_enable(self, enable_password):
+        self.elevate_privileges_with = "Cisco 'enable'"
+        self.escalation_password = enable_password
+        return self
 
-        if auth_method == "public key":
-            self.username = username
-            self.private_key = private_key_filename
-            self.private_key_passphrase = private_key_passphrase
+    def sudo(self, escalation_account, escalation_password):
+        self.elevate_privileges_with = "sudo"
+        self.escalation_account = escalation_account
+        self.escalation_password = escalation_password
+        return self
 
-        if auth_method == "certificate":
-            self.user_cert = user_cert_filename
-            self.username = username
-            self.private_key = private_key_filename
-            self.private_key_passphrase = private_key_passphrase
+class SshPassword(Ssh):
+    def __init__(self, username, password):
+        super(SshPassword, self).__init__()
+        self.auth_method = "password"
+        self.username = username
+        self.password = password
 
-        if auth_method == "password":
-            self.username = username
-            self.password = password
-            if elevate_privileges_with == "Cisco 'enable'":
-                self.escalation_password = escalation_password
-                if elevate_privileges_with == "sudo":
-                    self.escalation_account = escalation_account
-                    self.escalation_password = escalation_password
+class SshPublicKey(Ssh):
+    def __init__(self, username, private_key_filename, private_key_passphrase):
+        super(SshPublicKey, self).__init__()
+        self.auth_method = "public key"
+        self.username = username
+        self.private_key = private_key_filename
+        self.private_key_passphrase = private_key_passphrase
+
+class SshUserCert(SshPublicKey):
+    def __init__(self, username, user_cert_filename, private_key_filename, private_key_passphrase):
+        self.user_cert = user_cert_filename
+        super(SshUserCert, self).__init__(username=username,
+                                      private_key_filename=private_key_filename,
+                                      private_key_passphrase=private_key_passphrase)
 
 class Salesforce:
     category = "Cloud Services"

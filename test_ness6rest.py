@@ -49,10 +49,39 @@ def test_deduplicate_hosts():
     assert scan._deduplicate_hosts(hosts=[]) == []
 
 def test_SSH_Cisco_escalation():
-    cred = credentials.SSH(username="admin", password="pass", elevate_privileges_with="Cisco 'enable'", escalation_password="pass2")
+    cred = credentials.SshPassword(username="admin", password="pass").cisco_enable("pass2")
 
     assert cred.__dict__ == {'auth_method': 'password',
                              'elevate_privileges_with': "Cisco 'enable'",
                              'escalation_password': 'pass2',
                              'password': 'pass',
                              'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_password():
+    cred = credentials.SshPassword(username="admin",
+                           password="pass")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'Nothing',
+                             'username': 'admin',
+                             'password': 'pass'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_public_key():
+    cred = credentials.SshPublicKey(username="admin",
+                                 private_key_filename="test.cer",
+                                 private_key_passphrase="passphrase")
+
+    assert cred.__dict__ == {'auth_method': 'public key',
+                             'elevate_privileges_with': 'Nothing',
+                             'username': 'admin',
+                             'private_key': 'test.cer',
+                             'private_key_passphrase': 'passphrase'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"

@@ -31,10 +31,15 @@ import ness6rest
 
 setup(name="ness6rest",
       version=ness6rest.__version__,
-      py_modules=["ness6rest"],
-      author="Scott Walsh",
+      py_modules=["ness6rest", "test_ness6rest"],
+      author="Scott Walsh, Ben Bergman, Matthew Everson, Matthew Woelk",
       author_email="swalsh@tenable.com",
       url="https://github.com/tenable/nessrest",
+      license="Please see LICENSE file",
       description="An interface to the Nessus 6 REST API",
-      package_dir={"ness6rest": "ness6rest"}
+      package_dir={"ness6rest": "ness6rest"},
+      data_files=[("license", ["LICENSE"]),
+                  ("config", ["ness_rest.conf.example"]),
+                  ("readme", ["README.md"]),
+                  ("scripts", ["ness_rest"])]
       )

@@ -12,13 +12,20 @@ class SSH:
     category = "Host"
     name = "SSH"
 
-    def __init__(self, username, password="", auth_method="password", elevate_privileges_with="Nothing", escalation_account="", escalation_password="", private_key_filename="", private_key_passphrase=""):
+    def __init__(self, username, password="", auth_method="password", elevate_privileges_with="Nothing", escalation_account="", escalation_password="", private_key_filename="", private_key_passphrase="", user_cert_filename=""):
         if auth_method not in ("password", "certificate", "Kerberos", "public key"):
             raise ValueError('auth_method not valid')
 
         self.auth_method = auth_method
         self.elevate_privileges_with = elevate_privileges_with
+
         if auth_method == "public key":
+            self.username = username
+            self.private_key = private_key_filename
+            self.private_key_passphrase = private_key_passphrase
+
+        if auth_method == "certificate":
+            self.user_cert = user_cert_filename
             self.username = username
             self.private_key = private_key_filename
             self.private_key_passphrase = private_key_passphrase

@@ -49,7 +49,8 @@ def test_deduplicate_hosts():
     assert scan._deduplicate_hosts(hosts=[]) == []
 
 def test_SSH_Cisco_escalation():
-    cred = credentials.SshPassword(username="admin", password="pass").cisco_enable("pass2")
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .cisco_enable("pass2")
 
     assert cred.__dict__ == {'auth_method': 'password',
                              'elevate_privileges_with': "Cisco 'enable'",

@@ -20,10 +20,10 @@ class Ssh:
         self.escalation_password = enable_password
         return self
 
-    def sudo(self, escalation_account, escalation_password):
+    def sudo(self, password, username="root"):
         self.elevate_privileges_with = "sudo"
-        self.escalation_account = escalation_account
-        self.escalation_password = escalation_password
+        self.escalation_account = username
+        self.escalation_password = password
         return self
 
 class SshPassword(Ssh):
@@ -42,11 +42,13 @@ class SshPublicKey(Ssh):
         self.private_key_passphrase = private_key_passphrase
 
 class SshUserCert(SshPublicKey):
-    def __init__(self, username, user_cert_filename, private_key_filename, private_key_passphrase):
+    def __init__(self, username, user_cert_filename, private_key_filename,
+                 private_key_passphrase):
         self.user_cert = user_cert_filename
-        super(SshUserCert, self).__init__(username=username,
-                                      private_key_filename=private_key_filename,
-                                      private_key_passphrase=private_key_passphrase)
+        super(SshUserCert, self) \
+            .__init__(username=username,
+                      private_key_filename=private_key_filename,
+                      private_key_passphrase=private_key_passphrase)
 
 class Salesforce:
     category = "Cloud Services"

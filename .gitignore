@@ -1,0 +1,4 @@
+*.pyc
+ness_rest.conf
+__pycache__
+MANIFEST

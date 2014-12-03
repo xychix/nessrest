@@ -36,6 +36,7 @@ try:
 except:
     import ConfigParser
 import os
+import credentials
 
 # require arguments, or will be defaulted
 parser = argparse.ArgumentParser()
@@ -171,31 +172,38 @@ scan = nessrest.Scanner(url=url, login=login, password=password)
 if args.debug:
     scan.debug = True
 
-smb_creds = []
-ssh_creds = []
-smb_creds.append({"username": config.get('creds', 'smb_user'),
-                    "password": config.get('creds', 'smb_pass'),
-                    "domain": config.get('creds', 'smb_domain')})
+creds = []
+extras = [str(v) for v in ["", 1, 2, 3]]
+# Windows credentials from the config file
+for index in extras:
+    if config.get('creds', 'smb_user' + index):
+        creds.append(credentials.WindowsPassword(
+            username=config.get('creds', 'smb_user' + index),
+            password=config.get('creds', 'smb_pass' + index),
+            domain=config.get('creds', 'smb_domain' + index)))
 
-smb_creds.append({"username": config.get('creds', 'smb_user1'),
-                    "password": config.get('creds', 'smb_pass1'),
-                    "domain": config.get('creds', 'smb_domain1')})
+# TODO: smartly append values that don't appear at a later date
+# by abusing array indicies and exception handling, we could add many more
+# set of credentials.
+# Windows credentials from command line args
+args_vars = vars(args)
+for index in extras:
+    if args_vars["smb_user" + index]:
+        creds.append(credentials.WindowsPassword(
+            username=args_vars["smb_user" + index],
+            password=args_vars["smb_pass" + index],
+            domain=args_vars["smb_domain"+ index]))
 
-smb_creds.append({"username": config.get('creds', 'smb_user2'),
-                    "password": config.get('creds', 'smb_pass2'),
-                    "domain": config.get('creds', 'smb_domain2')})
+# SSH credentials from the config file
+creds.append(credentials.SshPassword(
+    username=config.get('creds', 'ssh_user'),
+    password=config.get('creds', 'ssh_pass')))
 
-smb_creds.append({"username": config.get('creds', 'smb_user3'),
-                    "password": config.get('creds', 'smb_pass3'),
-                    "domain": config.get('creds', 'smb_domain3')})
-
-scan.creds_smb = smb_creds
-
-ssh_creds.append({"username": config.get('creds', 'ssh_user'),
-                    "password": config.get('creds', 'ssh_pass')})
-
-scan.creds_ssh = ssh_creds
-
+# SSH credentials from command line args
+if (args.ssh_user and args.ssh_pass):
+    creds.append(credentials.SshPassword(
+        username=args.ssh_user,
+        password=args.ssh_pass))
 
 scan.safe_checks = config.get('settings', 'safe_checks')
 
@@ -209,24 +217,6 @@ scan.pref_silent_dependencies = config.get('prefs', 'silent_deps')
 # override default settings, needed for ACT_ATTACK and ACT_DENIAL
 if args.unsafe:
     scan.set_safe_checks = "no"
-
-# TODO: smartly append values that don't appear at a later date
-# by abusing array indicies and exception handling, we could add many more
-# set of credentials.
-extras = ["", 1, 2, 3]
-index = 0
-for each in extras:
-    cast = str(each)
-    # Update
-    if eval("args.smb_user" + cast):
-        scan.creds_smb[index]["username"] = eval("args.smb_user" + cast)
-        scan.creds_smb[index]["password"] = eval("args.smb_pass" + cast)
-        scan.creds_smb[index]["domain"] = eval("args.smb_domain" + cast)
-    index += 1
-
-if (args.ssh_user and args.ssh_pass):
-    scan.creds_ssh.append({"username": args.ssh_user,
-                            "password": args.ssh_pass})
 
 # override config file/Nessus defaults
 if args.cgi:
@@ -245,7 +235,7 @@ if args.silent_deps:
 if args.format:
     scan.format = True
 
-scan.policy_add(name=args.name, plugins=args.plugins)
+scan.policy_add(name=args.name, plugins=args.plugins, credentials=creds)
 
 if args.ports:
     scan.policy_add_ports(ports=args.ports)

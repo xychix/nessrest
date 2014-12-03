@@ -48,8 +48,6 @@ class Scanner(object):
     def __init__(self, url, login, password):
         self.name = ''
         self.policy_name = ''
-        self.creds_smb = []
-        self.creds_ssh = []
         self.debug = False
         self.format = ''
         self.format_start = ''
@@ -301,50 +299,6 @@ class Scanner(object):
         creds = {"credentials": {"add": creds}}
         self.action(action="policies/" + str(policy_id),
                     method="put", extra=creds)
-
-################################################################################
-    def _policy_set_creds(self):
-        '''
-        Set credentials. This might need a helper function to build the lists
-        of credentials in an easier manner.
-        '''
-
-        smb = {"credentials": {"add": {"Host": {"Windows": []}}}}
-        ssh = {"credentials": {"add": {"Host": {"SSH": []}}}}
-
-        if self.creds_smb:
-            for login in self.creds_smb:
-                # consider the domain optional, and make it empty if not
-                # supplied
-                if "domain" not in login:
-                    login["domain"] = ""
-                if not login["username"]:
-                    continue
-
-                smb["credentials"]["add"]["Host"]["Windows"].append(
-                    {"username": login["username"],
-                     "password": login["password"],
-                     "domain": login["domain"],
-                     "auth_method": "Password"})
-
-        self.action(action="policies/" + str(self.policy_id),
-                    method="put", extra=smb)
-
-        if self.creds_ssh:
-            for login in self.creds_ssh:
-                # SSH elevation defaults to a standard login if "elevate" is not
-                # supplied
-                if "elevate" not in login:
-                    login["elevate"] = "Nothing"
-
-                ssh["credentials"]["add"]["Host"]["SSH"].append(
-                    {"username": login["username"],
-                     "password": login["password"],
-                     "elevate_privileges_with": login["elevate"],
-                     "auth_method": "password"})
-
-        self.action(action="policies/" + str(self.policy_id),
-                    method="put", extra=ssh)
 
 ################################################################################
     def _policy_set_settings(self):

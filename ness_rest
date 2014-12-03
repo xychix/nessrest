@@ -174,36 +174,21 @@ if args.debug:
 
 creds = []
 extras = [str(v) for v in ["", 1, 2, 3]]
-# Windows credentials from the config file
+# Windows credentials from the config file, overridden by command line args
+args_dict = vars(args)
+get_cred = lambda k: args_dict[k] if args_dict[k] else config.get('creds', k)
 for index in extras:
-    if config.get('creds', 'smb_user' + index):
+    if get_cred('smb_user' + index):
         creds.append(credentials.WindowsPassword(
-            username=config.get('creds', 'smb_user' + index),
-            password=config.get('creds', 'smb_pass' + index),
-            domain=config.get('creds', 'smb_domain' + index)))
+            username=get_cred('smb_user' + index),
+            password=get_cred('smb_pass' + index),
+            domain=get_cred('smb_domain' + index)))
 
-# TODO: smartly append values that don't appear at a later date
-# by abusing array indicies and exception handling, we could add many more
-# set of credentials.
-# Windows credentials from command line args
-args_vars = vars(args)
-for index in extras:
-    if args_vars["smb_user" + index]:
-        creds.append(credentials.WindowsPassword(
-            username=args_vars["smb_user" + index],
-            password=args_vars["smb_pass" + index],
-            domain=args_vars["smb_domain"+ index]))
-
-# SSH credentials from the config file
-creds.append(credentials.SshPassword(
-    username=config.get('creds', 'ssh_user'),
-    password=config.get('creds', 'ssh_pass')))
-
-# SSH credentials from command line args
-if (args.ssh_user and args.ssh_pass):
+# SSH credentials from the config file, overridden by command line args
+if get_cred('ssh_user') and get_cred('ssh_pass'):
     creds.append(credentials.SshPassword(
-        username=args.ssh_user,
-        password=args.ssh_pass))
+        username=get_cred('ssh_user'),
+        password=get_cred('ssh_pass')))
 
 scan.safe_checks = config.get('settings', 'safe_checks')
 

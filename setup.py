@@ -59,6 +59,5 @@ setup(name="nessrest",
       ],
       keywords="nessus nessrest ness_rest",
       install_requires=['argparse >= 1.2.1', 'requests >= 1.4'],
-      entry_points={"console_scripts" :
-                    ["ness_rest = ness_rest:execute_from_command_line"]}
+      scripts=['nessrest/ness_rest']
       )

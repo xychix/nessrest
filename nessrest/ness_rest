@@ -31,6 +31,8 @@
 from __future__ import print_function
 import sys
 import argparse
+from nessrest import ness6rest
+
 try:
     import configparser as ConfigParser
 except:
@@ -133,8 +135,6 @@ parser.add_argument("--debug", action="store_true",
 
 args = parser.parse_args()
 
-import ness6rest as nessrest
-
 if not args.plugins:
     print("No plugins set!")
     sys.exit(1)
@@ -166,7 +166,7 @@ password = config.get('server', 'password')
 url = "https://%s:%s" % (config.get('server', 'host'),
                          config.get('server', 'port'))
 
-scan = nessrest.Scanner(url=url, login=login, password=password)
+scan = ness6rest.Scanner(url=url, login=login, password=password)
 
 if args.debug:
     scan.debug = True

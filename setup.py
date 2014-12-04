@@ -1,3 +1,6 @@
+'''
+Build script for the nessrest module
+'''
 # Copyright (c) 2014, Tenable Network Security, Inc.
 # All rights reserved.
 #
@@ -26,20 +29,37 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from distutils.core import setup
-import ness6rest
+from setuptools import setup
+from codecs import open
+from os import path
+from nessrest import ness6rest
 
-setup(name="ness6rest",
+here = path.abspath(path.dirname(__file__))
+
+with open(path.join(here, "README.md"), encoding="utf-8") as f:
+    long_description = f.read()
+
+with open(path.join(here, "LICENSE"), encoding="utf-8") as f:
+    license = f.read()
+
+setup(name="nessrest",
       version=ness6rest.__version__,
-      py_modules=["ness6rest", "test_ness6rest"],
+      packages=["nessrest"],
+      include_package_data=True,
+      exclude_package_data={'': ['*.pyc']},
       author="Scott Walsh, Ben Bergman, Matthew Everson, Matthew Woelk",
       author_email="swalsh@tenable.com",
       url="https://github.com/tenable/nessrest",
-      license="Please see LICENSE file",
+      include_dirs=["."],
+      license=license,
       description="An interface to the Nessus 6 REST API",
-      package_dir={"ness6rest": "ness6rest"},
-      data_files=[("license", ["LICENSE"]),
-                  ("config", ["ness_rest.conf.example"]),
-                  ("readme", ["README.md"]),
-                  ("scripts", ["ness_rest"])]
-      )
+      long_description=long_description,
+      classifiers=[
+          "Development Status :: 4 - Beta",
+          "Intended Audience :: Developers:",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3",
+      ],
+      keywords="nessus nessrest ness_rest",
+      install_requires=['argparse >= 1.2.1', 'requests >= 1.4'],
+      scripts=['nessrest/ness_rest'])

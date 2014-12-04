@@ -11,7 +11,7 @@
 
 * Logins
 
-  ```
+  ```python
   scan = nessrest.Scanner(url="https://nessusscanner:8834", login="username", password="password")
 
   creds = [credentials.Windows(username="administrator", password="foobar"),
@@ -22,7 +22,7 @@
   ```
 * Build policies
 
-  ```
+  ```python
   scan.upload(upload_file="file.audit")
   scan._policy_add_audit(category="Windows", filename="file.audit")
   scan.policy_add(name="Scripted Scan", plugins="21156")
@@ -30,20 +30,20 @@
 
 * Launch scans
 
-  ```
+  ```python
   scan.scan_add(targets="192.168.0.1")
   scan.scan_run()
   ```
 
 * Parse scan results
 
-  ```
+  ```python
   scan.scan_results()
   ```
 
 * Download KB for target
 
-  ```
+  ```python
   kbs = scan.download_kbs()
 
   for hostname in kbs.keys():

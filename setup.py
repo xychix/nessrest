@@ -1,3 +1,6 @@
+'''
+Build script for the nessrest module
+'''
 # Copyright (c) 2014, Tenable Network Security, Inc.
 # All rights reserved.
 #
@@ -26,7 +29,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from codecs import open
 from os import path
 from nessrest import ness6rest
@@ -39,11 +42,11 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 with open(path.join(here, "LICENSE"), encoding="utf-8") as f:
     license = f.read()
 
-
 setup(name="nessrest",
       version=ness6rest.__version__,
       packages=["nessrest"],
-      package_data={"nessrest": ["LICENSE", "ness_rest", "README.md"]},
+      include_package_data=True,
+      exclude_package_data={'': ['*.pyc']},
       author="Scott Walsh, Ben Bergman, Matthew Everson, Matthew Woelk",
       author_email="swalsh@tenable.com",
       url="https://github.com/tenable/nessrest",
@@ -59,5 +62,4 @@ setup(name="nessrest",
       ],
       keywords="nessus nessrest ness_rest",
       install_requires=['argparse >= 1.2.1', 'requests >= 1.4'],
-      scripts=['nessrest/ness_rest']
-      )
+      scripts=['nessrest/ness_rest'])

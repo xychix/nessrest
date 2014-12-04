@@ -31,7 +31,7 @@
 from __future__ import print_function
 import sys
 import argparse
-from import ness6rest
+from nessrest import ness6rest
 
 try:
     import configparser as ConfigParser

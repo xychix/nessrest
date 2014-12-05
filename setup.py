@@ -56,10 +56,9 @@ setup(name="nessrest",
       long_description=long_description,
       classifiers=[
           "Development Status :: 4 - Beta",
-          "Intended Audience :: Developers:",
           "Programming Language :: Python :: 2.7",
           "Programming Language :: Python :: 3",
       ],
       keywords="nessus nessrest ness_rest",
-      install_requires=['argparse >= 1.2.1', 'requests >= 1.4'],
+      install_requires=['argparse >= 1.0', 'requests >= 1.4'],
       scripts=['nessrest/ness_rest'])

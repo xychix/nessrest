@@ -28,6 +28,7 @@
 
 import os
 import ness6rest as nessrest
+import credentials
 
 def test_deduplicate_hosts():
     login = os.getenv("NESSUS_USER")
@@ -46,3 +47,70 @@ def test_deduplicate_hosts():
          {'hostname': 'host1', 'host_id': '1'}]
 
     assert scan._deduplicate_hosts(hosts=[]) == []
+
+def test_SSH_Cisco_escalation():
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .cisco_enable("pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': "Cisco 'enable'",
+                             'escalation_password': 'pass2',
+                             'password': 'pass',
+                             'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_sudo_escalation_default_account():
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .sudo("pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'sudo',
+                             'escalation_password': 'pass2',
+                             'escalation_account': 'root',
+                             'password': 'pass',
+                             'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_sudo_escalation():
+    cred = credentials.SshPassword(username="admin", password="pass") \
+        .sudo(username="nessus", password="pass2")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'sudo',
+                             'escalation_password': 'pass2',
+                             'escalation_account': 'nessus',
+                             'password': 'pass',
+                             'username': 'admin'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_password():
+    cred = credentials.SshPassword(username="admin",
+                           password="pass")
+
+    assert cred.__dict__ == {'auth_method': 'password',
+                             'elevate_privileges_with': 'Nothing',
+                             'username': 'admin',
+                             'password': 'pass'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"
+
+def test_SSH_public_key():
+    cred = credentials.SshPublicKey(username="admin",
+                                 private_key_filename="test.cer",
+                                 private_key_passphrase="passphrase")
+
+    assert cred.__dict__ == {'auth_method': 'public key',
+                             'elevate_privileges_with': 'Nothing',
+                             'username': 'admin',
+                             'private_key': 'test.cer',
+                             'private_key_passphrase': 'passphrase'}
+
+    assert cred.category == "Host"
+    assert cred.name == "SSH"

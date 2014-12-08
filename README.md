@@ -14,9 +14,9 @@
   ```python
   scan = nessrest.Scanner(url="https://nessusscanner:8834", login="username", password="password")
 
-  creds = [credentials.Windows(username="administrator", password="foobar"),
-           credentials.Windows(username="administrator", password="barfoo"),
-           credentials.SSH(username="nessususer", password="foobar")]
+  creds = [credentials.WindowsPassword(username="administrator", password="foobar"),
+           credentials.WindowsPassword(username="administrator", password="barfoo"),
+           credentials.SshPassword(username="nessususer", password="foobar")]
 
   scan.policy_add_creds(credentials=creds)
   ```

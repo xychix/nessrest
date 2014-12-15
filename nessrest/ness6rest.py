@@ -30,7 +30,7 @@ from __future__ import print_function
 '''
 Module for interacting with Nessus REST interface
 '''
-__version__ = "0.11"
+__version__ = "0.13"
 
 import os
 import sys

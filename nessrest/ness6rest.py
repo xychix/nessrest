@@ -291,7 +291,7 @@ class Scanner(object):
         if not policy_id:
             policy_id = self.policy_id
 
-        creds = collections.defaultdict(lambda:collections.defaultdict(list))
+        creds = collections.defaultdict(lambda: collections.defaultdict(list))
 
         for credential in credentials:
             creds[credential.category][credential.name].append(credential.__dict__)
@@ -304,7 +304,8 @@ class Scanner(object):
     def _policy_set_settings(self):
         '''
         Current settings include: safe_checks, scan_webapps, report_paranoia,
-        provided_creds_only, thorough_tests, report_verbosity, silent_dependencies
+        provided_creds_only, thorough_tests, report_verbosity,
+        silent_dependencies
         '''
         settings = {"settings": {}}
 
@@ -561,7 +562,7 @@ class Scanner(object):
 
 ################################################################################
     def _deduplicate_hosts(self, hosts):
-        return list({v["hostname"]:v for v in hosts}.values())
+        return list({v["hostname"]: v for v in hosts}.values())
 
 ################################################################################
     def download_kbs(self):
@@ -574,10 +575,10 @@ class Scanner(object):
         kbs = {}
         for host in hosts:
             kbs[host["hostname"]] = self.action("scans/" + str(self.scan_id) +
-                                              "/hosts/" + str(host["host_id"]) +
-                                              "/kb?token=" + str(self.token),
-                                              method="get",
-                                              download=True)
+                                                "/hosts/" + str(host["host_id"]) +
+                                                "/kb?token=" + str(self.token),
+                                                method="get",
+                                                download=True)
 
         return kbs
 
@@ -640,16 +641,17 @@ class Scanner(object):
             if self.format_end:
                 print(self.format_end)
 
-        for host in self.res["comphosts"]:
-            print("----------------------------------------")
-            print("Target    : %s" % host["hostname"])
-            print("----------------------------------------\n")
+        if self.res is not None:
+            for host in self.res["comphosts"]:
+                print("----------------------------------------")
+                print("Target    : %s" % host["hostname"])
+                print("----------------------------------------\n")
 
-            for plugin in self.res["compliance"]:
-                self.action("scans/" + str(self.scan_id) + "/hosts/" +
-                            str(host["host_id"]) + "/compliance/" + str(plugin['plugin_id']),
-                            method="get")
-                self.pretty_print()
+                for plugin in self.res["compliance"]:
+                    self.action("scans/" + str(self.scan_id) + "/hosts/" +
+                                str(host["host_id"]) + "/compliance/" +
+                                str(plugin['plugin_id']), method="get")
+                    self.pretty_print()
 
 ################################################################################
     def upload(self, upload_file, file_contents=""):
@@ -678,7 +680,7 @@ class Scanner(object):
         data = {'file': filename}
         self.action(action="policies/import",
                     method="post",
-                    extra =data)
+                    extra=data)
         print("Imported policy named '%s', id %s" % (self.res['name'],
                                                      self.res['id']))
         return self.res['id']

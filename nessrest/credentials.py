@@ -1,4 +1,4 @@
-class WindowsPassword:
+class WindowsPassword(object):
     '''
     Username and password for a Windows target.
     '''
@@ -11,7 +11,8 @@ class WindowsPassword:
         self.domain = domain
         self.auth_method = auth_method
 
-class Ssh:
+
+class Ssh(object):
     '''
     Does not provide complete credential information on its own. Create one of
     its subclasses instead. The privilege escalation functions can be used on
@@ -34,6 +35,7 @@ class Ssh:
         self.escalation_password = password
         return self
 
+
 class SshPassword(Ssh):
     '''
     Username and password for an SSH login.
@@ -43,6 +45,7 @@ class SshPassword(Ssh):
         self.auth_method = "password"
         self.username = username
         self.password = password
+
 
 class SshPublicKey(Ssh):
     '''
@@ -54,6 +57,7 @@ class SshPublicKey(Ssh):
         self.username = username
         self.private_key = private_key_filename
         self.private_key_passphrase = private_key_passphrase
+
 
 class SshUserCert(SshPublicKey):
     '''
@@ -68,7 +72,8 @@ class SshUserCert(SshPublicKey):
                       private_key_filename=private_key_filename,
                       private_key_passphrase=private_key_passphrase)
 
-class Salesforce:
+
+class Salesforce(object):
     '''
     Username and password for Salesforce.com.
     '''
@@ -79,7 +84,8 @@ class Salesforce:
         self.username = username
         self.password = password
 
-class PaloAltoPANOS:
+
+class PaloAltoPANOS(object):
     '''
     Username and password for a Palo Alto PAN-OS device through the web API.
     '''

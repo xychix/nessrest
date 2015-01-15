@@ -32,7 +32,7 @@ Build script for the nessrest module
 from setuptools import setup
 from codecs import open
 from os import path
-from nessrest import ness6rest
+import nessrest
 
 here = path.abspath(path.dirname(__file__))
 
@@ -43,7 +43,7 @@ with open(path.join(here, "LICENSE"), encoding="utf-8") as f:
     license = f.read()
 
 setup(name="nessrest",
-      version=ness6rest.__version__,
+      version=nessrest.__version__,
       packages=["nessrest"],
       include_package_data=True,
       exclude_package_data={'': ['*.pyc']},

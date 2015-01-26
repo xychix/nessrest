@@ -214,7 +214,7 @@ class Scanner(object):
         self.ver_plugins = self.res['loaded_plugin_set']
 
 ################################################################################
-    def policy_add(self, name, plugins, credentials, template="advanced"):
+    def policy_add(self, name, plugins, credentials=[], template="advanced"):
         '''
         Add a policy and store the returned ID. The template defaults to
         "advanced" to remain compatible with the calls that occur in Nessus

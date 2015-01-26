@@ -12,7 +12,7 @@
 * Logins
 
   ```python
-  scan = nessrest.Scanner(url="https://nessusscanner:8834", login="username", password="password")
+  scan = ness6rest.Scanner(url="https://nessusscanner:8834", login="username", password="password")
 
   creds = [credentials.WindowsPassword(username="administrator", password="foobar"),
            credentials.WindowsPassword(username="administrator", password="barfoo"),

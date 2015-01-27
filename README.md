@@ -75,12 +75,16 @@
 * Test by issuing `import ness6rest` inside the Python interactive
   interperter.
 
-### InsecureRequestWarning
+### Self-signed certificates
 
-If you're running Nessus with a self-signed certificate, and you wish to squelch the InsecureRequestWarnings that the requests library uses, you can add the following line after the import requests line in ness6rest.py:
-`requests.packages.urllib3.disable_warnings()`
+If you're running Nessus with a self-signed certificate, and you wish to disable SSL certificate checking, you can pass insecure=True to the Scanner initializer:
+  ```python
+  scan = ness6rest.Scanner(url="https://nessusscanner:8834", login="username", password="password", insecure=True)
+  ```
 
-This will disable invalid cerficate warnings and should be used with caution.
+If you're using the nessrest example client, it has a --insecure option that will do this.
+
+Note that this will disable invalid SSL cerficate errors and should be used with caution.
 
 ### Configuration file:
 

@@ -133,6 +133,9 @@ parser.add_argument("--silent_deps", action="store_true",
 parser.add_argument("--debug", action="store_true",
                     help="enable debugging")
 
+parser.add_argument("--insecure", action="store_true",
+                    help="disable SSL certificate checking (use with caution!)")
+
 args = parser.parse_args()
 
 if not args.plugins:
@@ -165,8 +168,14 @@ login = config.get('server', 'login')
 password = config.get('server', 'password')
 url = "https://%s:%s" % (config.get('server', 'host'),
                          config.get('server', 'port'))
-
-scan = ness6rest.Scanner(url=url, login=login, password=password)
+try:
+    scan = ness6rest.Scanner(url=url, login=login, password=password, insecure=args.insecure)
+except ness6rest.SSLException as ex:
+    print("SSL Error: %s\nYou can use --insecure to disable SSL certificate checking, but use this with caution!\nExiting.\n" % ex)
+    sys.exit(1)
+except Exception as ex:
+    print("Unexpected Error: %s" % ex)
+    sys.exit(1)
 
 if args.debug:
     scan.debug = True

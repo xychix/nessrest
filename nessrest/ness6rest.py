@@ -40,11 +40,15 @@ import json
 import collections
 
 
+class SSLException(Exception):
+    pass
+
+
 class Scanner(object):
     '''
     Scanner object
     '''
-    def __init__(self, url, login, password):
+    def __init__(self, url, login, password, insecure=False):
         self.name = ''
         self.policy_name = ''
         self.debug = False
@@ -82,6 +86,10 @@ class Scanner(object):
         self.ver_plugins = ''
         self.ver_svr = ''
         self.ver_web = ''
+	self.insecure = insecure
+
+	if insecure:
+	    requests.packages.urllib3.disable_warnings()
 
         # Initial login to get our token for all subsequent transactions
         self.action(action="session",
@@ -145,7 +153,7 @@ class Scanner(object):
 
         try:
             req = requests.request(method, url, data=payload, files=files,
-                                   verify=False, headers=headers)
+                                   verify=(not self.insecure), headers=headers)
 
             if not download:
                 self.res = req.json()
@@ -175,10 +183,10 @@ class Scanner(object):
 
             if download:
                 return req.text
-
+	except requests.exceptions.SSLError:
+	    raise SSLException('Invalid SSL certificate for %s.' % url)
         except requests.exceptions.ConnectionError:
-            print("Could not connect to %s.\nExiting!\n" % url)
-            sys.exit(1)
+	    raise Exception("Could not connect to %s.\nExiting!\n" % url)
 
 
 ################################################################################

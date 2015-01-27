@@ -68,6 +68,7 @@ class Scanner(object):
         self.pref_silent_dependencies = ''
         self.res = {}
         self.scan_id = ''
+        self.scan_name = ''
         self.scan_template_uuid = ''
         self.scan_uuid = ''
         self.tag_id = ''
@@ -478,7 +479,7 @@ class Scanner(object):
                     method="put", extra=families)
 
 ################################################################################
-    def scan_add(self, targets, template="custom"):
+    def scan_add(self, targets, template="custom", name=""):
         '''
         After building the policy, create a scan.
         '''
@@ -490,6 +491,12 @@ class Scanner(object):
         text_targets = targets.replace(",", "\n")
 
         self.targets = targets.replace(",", " ")
+
+        # Figure out scan name
+        if name:
+            self.scan_name = name
+        else:
+            self.scan_name = self.policy_name
 
         scan = {"uuid": self.scan_template_uuid}
         settings = {}
@@ -504,7 +511,7 @@ class Scanner(object):
         settings.update({"filter_type": ""})
 
         # Dynamic items
-        settings.update({"name": self.policy_name})
+        settings.update({"name": self.scan_name})
         settings.update({"policy_id": self.policy_id})
         settings.update({"folder_id": self.tag_id})
         settings.update({"text_targets": text_targets})
@@ -533,7 +540,7 @@ class Scanner(object):
 
         self.scan_uuid = self.res["scan_uuid"]
 
-        print("Scan name : %s" % self.policy_name)
+        print("Scan name : %s" % self.scan_name)
         print("Scan UUID : %s" % self.scan_uuid)
 
 ################################################################################

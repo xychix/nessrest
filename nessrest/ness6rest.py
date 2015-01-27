@@ -52,7 +52,7 @@ class Scanner(object):
         self.format_start = ''
         self.format_end = ''
         self.http_response = ''
-        self.plugins = ''
+        self.plugins = {}
         self.names = {}
         self.files = {}
         self.cisco_offline_configs = ''
@@ -235,7 +235,8 @@ class Scanner(object):
 
         self.policy_add_creds(credentials=credentials)
         self._policy_set_settings()
-        self._enable_plugins(plugins=plugins)
+        self.plugins_info(plugins=plugins)
+        self._enable_plugins()
 
 ################################################################################
     def policy_details(self, policy_id):
@@ -349,8 +350,10 @@ class Scanner(object):
         settings["settings"].update({"provided_creds_only": self.pref_supplied})
         settings["settings"].update({"thorough_tests": self.pref_thorough})
         settings["settings"].update({"report_verbosity": self.pref_verbose})
-        settings["settings"].update({"silent_dependencies": self.pref_silent_dependencies})
-        settings["settings"].update({"cisco_offline_configs": self.cisco_offline_configs})
+        settings["settings"].update({"silent_dependencies":
+                                     self.pref_silent_dependencies})
+        settings["settings"].update({"cisco_offline_configs":
+                                     self.cisco_offline_configs})
 
         self.action(action="policies/" + str(self.policy_id), method="put",
                     extra=settings)
@@ -367,6 +370,27 @@ class Scanner(object):
 
         self.action(action="policies/" + str(self.policy_id),
                     method="put", extra=audit)
+
+################################################################################
+    def plugin_info(self, plugins):
+        '''
+        Gather information on plugins for reporting. This also ensures that the
+        plugin exists, and exits if it does not.
+        '''
+        for plugin in plugins.split(','):
+            self.action(action="plugins/plugin/" + str(plugin), method="GET")
+
+            if self.res:
+                for attrib in self.res["attributes"]:
+                    if attrib["attribute_name"] == "fname":
+                        self.plugins.update({str(plugin):
+                                             {"fname":
+                                              attrib["attribute_value"],
+                                              "name": self.res["name"]}})
+            else:
+                # We don't want to scan with plugins that don't exist.
+                print ("Plugin with ID %s is not found. Exiting." % plugin)
+                sys.exit(1)
 
 ################################################################################
     def _enable_plugins(self, plugins):
@@ -390,12 +414,9 @@ class Scanner(object):
         self.action(action="policies/" + str(self.policy_id),
                     method="put", extra=families)
 
-        plugins = plugins.replace(",", " ")
-        self.plugins = plugins
-
         # Query the search interface to get the family information for the
         # plugin
-        for plugin in plugins.split(' '):
+        for plugin in self.plugins.iterkeys():
             self.action(action="editor/policy/" + str(self.policy_id) +
                         "/families?filter.search_type=and&" +
                         "filter.0.filter=plugin_id&filter.0.quality=eq&" +
@@ -601,7 +622,7 @@ class Scanner(object):
             print("Target    : %s" % host["hostname"])
             print("----------------------------------------\n")
 
-            for plugin in self.plugins.split(' '):
+            for plugin in self.plugins.iterkeys():
                 self.action("scans/" + str(self.scan_id) + "/hosts/" +
                             str(host["host_id"]) + "/plugins/" + str(plugin),
                             method="get")
@@ -609,9 +630,8 @@ class Scanner(object):
                 # If not defined, the plugin did not fire for the host
                 if self.res["outputs"]:
 
-                    print("Plugin Name   : " + self.res["info"]["plugindescription"]["pluginname"])
-                    print("Plugin File   : " + self.res["info"]["plugindescription"]["pluginattributes"]["fname"])
-
+                    print("Plugin Name   : " + self.plugins[plugin]["name"])
+                    print("Plugin File   : " + self.plugins[plugin]["fname"])
                     print("Plugin ID     : %s" % plugin)
                     print("Plugin Output :")
 
@@ -633,6 +653,10 @@ class Scanner(object):
                 # If there is audit trail, the self.res is 'null'
                 if self.res:
                     for output in self.res:
+                        print("Plugin Name   : " +
+                              self.plugins[plugin]["name"])
+                        print("Plugin File   : " +
+                              self.plugins[plugin]["fname"])
                         print("Plugin ID     : %s" % plugin)
                         print("Audit trail   : " + output["output"])
                         print()

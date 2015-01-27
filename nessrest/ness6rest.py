@@ -86,7 +86,7 @@ class Scanner(object):
         self.ver_plugins = ''
         self.ver_svr = ''
         self.ver_web = ''
-	self.insecure = insecure
+        self.insecure = insecure
 
 	if insecure:
 	    requests.packages.urllib3.disable_warnings()

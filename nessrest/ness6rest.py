@@ -88,8 +88,8 @@ class Scanner(object):
         self.ver_web = ''
         self.insecure = insecure
 
-	if insecure:
-	    requests.packages.urllib3.disable_warnings()
+        if insecure:
+            requests.packages.urllib3.disable_warnings()
 
         # Initial login to get our token for all subsequent transactions
         self.action(action="session",
@@ -183,10 +183,10 @@ class Scanner(object):
 
             if download:
                 return req.text
-	except requests.exceptions.SSLError:
-	    raise SSLException('Invalid SSL certificate for %s.' % url)
+        except requests.exceptions.SSLError:
+            raise SSLException('Invalid SSL certificate for %s.' % url)
         except requests.exceptions.ConnectionError:
-	    raise Exception("Could not connect to %s.\nExiting!\n" % url)
+            raise Exception("Could not connect to %s.\nExiting!\n" % url)
 
 
 ################################################################################

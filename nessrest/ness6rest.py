@@ -239,6 +239,23 @@ class Scanner(object):
         self._enable_plugins()
 
 ################################################################################
+    def policy_set(self, name):
+        '''
+        Set existing policy to use for a scan.
+        '''
+        self.policy_name = name
+        self.action(action="policies", method="get")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == name:
+                self.policy_id = policy["id"]
+                break
+
+        if not self.policy_id:
+            print("no policy with name %s found. Exiting" % name)
+            sys.exit(1)
+
+################################################################################
     def policy_details(self, policy_id):
         '''
         Retrieves details of an existing policy.

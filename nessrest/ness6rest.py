@@ -398,7 +398,7 @@ class Scanner(object):
                     method="put", extra=audit)
 
 ################################################################################
-    def plugin_info(self, plugins):
+    def plugins_info(self, plugins):
         '''
         Gather information on plugins for reporting. This also ensures that the
         plugin exists, and exits if it does not.
@@ -419,7 +419,7 @@ class Scanner(object):
                 sys.exit(1)
 
 ################################################################################
-    def _enable_plugins(self, plugins):
+    def _enable_plugins(self, plugins=[]):
         '''
         Disable all of the families, and then enable plugins that you need. This
         builds the entire "plugins" object, and can be very large for some

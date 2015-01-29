@@ -75,6 +75,15 @@
 * Test by issuing `import ness6rest` inside the Python interactive
   interperter.
 
+### Specifying a ca\_bundle
+
+If you are using a corporate or self-signed SSL certificate, you can specify the path to a ca\_bundle to use for verification by passing it to the Scanner initializer:
+  ```python
+  scan = ness6rest.Scanner(url="https://nessusscanner:8834", login="username", password="password", ca_bundle="/path/to/ca_bundle.pem")
+  ```
+
+If you are using the ness\_rest client, you can pass this path on the command line using the --ca\_bundle option.
+
 ### Self-signed certificates
 
 If you're running Nessus with a self-signed certificate, and you wish to disable SSL certificate checking, you can pass insecure=True to the Scanner initializer:

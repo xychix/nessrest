@@ -93,6 +93,9 @@ class Scanner(object):
         if insecure and hasattr(requests, 'packages'):
             requests.packages.urllib3.disable_warnings()
 
+        self.host_vulns = {}
+        self.plugin_output = {}
+
         # Initial login to get our token for all subsequent transactions
         self._login(login, password)
 
@@ -725,6 +728,65 @@ class Scanner(object):
         if not self.tag_id:
             self.action("folders", method="post", extra={"name": self.tag_name})
             self.tag_id = self.res["id"]
+
+################################################################################
+    def scan_details(self, name):
+        '''
+        Fetch the details of the requested scan
+        '''
+
+        # Find the scan id based on the name
+        self.action(action="scans", method="get")
+
+        for scan in self.res["scans"]:
+            if scan["name"] == name:
+                self.scan_id = scan["id"]
+                break
+
+        if not self.scan_id:
+            print("no scan with name %s found. Exiting" % name)
+            sys.exit(1)
+
+        # Get the details of the scan
+        self.action(action="scans/" + str(self.scan_id), method="get")
+
+################################################################################
+    def get_host_vulns(self, name):
+        '''
+        Fill in host_vulns dict with the host vulnerabilities found in a
+        scan
+        '''
+
+        # Get details of requested scan
+        self.scan_details(name)
+
+        for host in self.res["hosts"]:
+            self.action(action="scans/" + str(self.scan_id) + "/hosts/" + str(host["host_id"]), method="get")
+            #print("scans/" + str(self.scan_id)+ "/hosts/" +str(host["host_id"]))
+            if self.scan_id not in self.host_vulns:
+                self.host_vulns[self.scan_id] = {}
+            self.host_vulns[self.scan_id][host["host_id"]]=self.res
+
+################################################################################
+    def get_plugin_output(self, scan, plugin_id):
+        '''
+        Fill in plugin_output dict with the output from a given plugin
+        in a given scan
+        '''
+        # Make sure the supplied plugin_id is of type int
+        plugin_id = int(plugin_id)
+
+        # Get list of host vulns
+        self.get_host_vulns(scan)
+
+        for scan_id in self.host_vulns:
+           for host_id in self.host_vulns[scan_id]:
+               for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
+                   if vulnerability["plugin_id"] == plugin_id:
+                       self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="get")
+                       if scan_id not in self.plugin_output:
+                           self.plugin_output[scan_id] = {}
+                       self.plugin_output[scan_id][host_id]=self.res
 
 ################################################################################
     def _deduplicate_hosts(self, hosts):

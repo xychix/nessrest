@@ -48,7 +48,7 @@ class Scanner(object):
     '''
     Scanner object
     '''
-    def __init__(self, url, login, password, insecure=False):
+    def __init__(self, url, login, password, insecure=False, ca_bundle=''):
         self.name = ''
         self.policy_name = ''
         self.debug = False
@@ -86,6 +86,7 @@ class Scanner(object):
         self.ver_plugins = ''
         self.ver_svr = ''
         self.ver_web = ''
+        self.ca_bundle = ca_bundle
         self.insecure = insecure
 
         if insecure:
@@ -151,9 +152,18 @@ class Scanner(object):
             print("METHOD  : %s" % method)
             print("\n")
 
+        # Figure out if we should verify SSL connection (possibly with a user
+        # supplied CA bundle). Default to true.
+        if self.insecure:
+            verify = False
+        elif self.ca_bundle:
+            verify = self.ca_bundle
+        else:
+            verify = True
+
         try:
             req = requests.request(method, url, data=payload, files=files,
-                                   verify=(not self.insecure), headers=headers)
+                                   verify=verify, headers=headers)
 
             if not download:
                 self.res = req.json()
@@ -183,8 +193,8 @@ class Scanner(object):
 
             if download:
                 return req.text
-        except requests.exceptions.SSLError:
-            raise SSLException('Invalid SSL certificate for %s.' % url)
+        except requests.exceptions.SSLError as ssl_error:
+            raise SSLException('%s for %s.' % (ssl_error, url))
         except requests.exceptions.ConnectionError:
             raise Exception("Could not connect to %s.\nExiting!\n" % url)
 

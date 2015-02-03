@@ -99,6 +99,3 @@ This will disable invalid cerficate warnings and should be used with caution.
 * To build a package to install via `pip` or `easy_install`, execute:
     * `python setup.py sdist`
 * The resulting build will be in `$PWD/dist/ness6rest-<version>.tar.gz`
-
-### Changelog:
-* 2014-2015-10-31: Support added for Nessus 6.0.1

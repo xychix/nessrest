@@ -101,4 +101,4 @@ This will disable invalid cerficate warnings and should be used with caution.
 * The resulting build will be in `$PWD/dist/ness6rest-<version>.tar.gz`
 
 ### Changelog:
-* 2014-10-31: Support added for Nessus 6.0.1
+* 2014-2015-10-31: Support added for Nessus 6.0.1

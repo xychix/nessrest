@@ -1,7 +1,7 @@
 '''
 Build script for the nessrest module
 '''
-# Copyright (c) 2014, Tenable Network Security, Inc.
+# Copyright (c) 2014-2015, Tenable Network Security, Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without

@@ -112,6 +112,3 @@ Note that this will disable invalid SSL cerficate errors and should be used with
 * To build a package to install via `pip` or `easy_install`, execute:
     * `python setup.py sdist`
 * The resulting build will be in `$PWD/dist/ness6rest-<version>.tar.gz`
-
-### Changelog:
-* 2014-10-31: Support added for Nessus 6.0.1

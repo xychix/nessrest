@@ -136,6 +136,9 @@ parser.add_argument("--debug", action="store_true",
 parser.add_argument("--insecure", action="store_true",
                     help="disable SSL certificate checking (use with caution!)")
 
+parser.add_argument("--ca_bundle", default="",
+                    help="path to a ca_bundle used to verify SSL certificates")
+
 args = parser.parse_args()
 
 if not args.plugins:
@@ -169,7 +172,7 @@ password = config.get('server', 'password')
 url = "https://%s:%s" % (config.get('server', 'host'),
                          config.get('server', 'port'))
 try:
-    scan = ness6rest.Scanner(url=url, login=login, password=password, insecure=args.insecure)
+    scan = ness6rest.Scanner(url=url, login=login, password=password, insecure=args.insecure, ca_bundle=args.ca_bundle)
 except ness6rest.SSLException as ex:
     print("SSL Error: %s\nYou can use --insecure to disable SSL certificate checking, but use this with caution!\nExiting.\n" % ex)
     sys.exit(1)

@@ -645,6 +645,39 @@ class Scanner(object):
         return kbs
 
 ################################################################################
+    def download_scan(self, export_format="nessus"):
+        running = True
+        counter = 0
+
+        self.action("scans/" + str(self.scan_id), method="get")
+        data = {'format': export_format}
+        self.action("scans/" + str(self.scan_id) + "/export",
+                                        method="post",
+                                        extra=data)
+
+        file_id = self.res['file']
+        print('Download for file id '+str(self.res['file'])+'.')
+        while running:
+            time.sleep(2)
+            counter += 2
+            self.action("scans/" + str(self.scan_id) + "/export/"
+                                            + str(file_id) + "/status",
+                                            method="get")
+            running = self.res['status'] != 'ready'
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            if counter % 60 == 0:
+                print("")
+
+        print("")
+
+        content = self.action("scans/" + str(self.scan_id) + "/export/"
+                              + str(file_id) + "/download",
+                              method="get",
+                              download=True)
+        return content
+
+################################################################################
     def scan_results(self):
         '''
         Get the list of hosts, then iterate over them and extract results

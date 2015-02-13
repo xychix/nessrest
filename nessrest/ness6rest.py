@@ -89,7 +89,7 @@ class Scanner(object):
         self.ca_bundle = ca_bundle
         self.insecure = insecure
 
-        if insecure:
+        if insecure and hasattr(requests, 'packages'):
             requests.packages.urllib3.disable_warnings()
 
         # Initial login to get our token for all subsequent transactions
@@ -452,7 +452,7 @@ class Scanner(object):
 
         # Query the search interface to get the family information for the
         # plugin
-        for plugin in self.plugins.iterkeys():
+        for plugin in self.plugins.keys():
             self.action(action="editor/policy/" + str(self.policy_id) +
                         "/families?filter.search_type=and&" +
                         "filter.0.filter=plugin_id&filter.0.quality=eq&" +
@@ -664,7 +664,7 @@ class Scanner(object):
             print("Target    : %s" % host["hostname"])
             print("----------------------------------------\n")
 
-            for plugin in self.plugins.iterkeys():
+            for plugin in self.plugins.keys():
                 self.action("scans/" + str(self.scan_id) + "/hosts/" +
                             str(host["host_id"]) + "/plugins/" + str(plugin),
                             method="get")

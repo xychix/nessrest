@@ -258,6 +258,21 @@ class Scanner(object):
         self._enable_plugins()
 
 ################################################################################
+    def policy_exists(self, name):
+        '''
+        Set existing policy to use for a scan.
+        '''
+        self.policy_name = name
+        self.action(action="policies", method="get")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == name:
+                self.policy_id = policy["id"]
+                return True
+
+        return False
+
+################################################################################
     def policy_set(self, name):
         '''
         Set existing policy to use for a scan.
@@ -393,6 +408,29 @@ class Scanner(object):
 
         self.action(action="policies/" + str(self.policy_id), method="put",
                     extra=settings)
+
+################################################################################
+    def _policy_remove_audits(self, category, type='custom'):
+        '''
+        Removes all audit files from the policy.
+        '''
+        delete_ids = []
+
+        self.action(action="editor/policy/" + str(self.policy_id),
+                    method="get")
+
+        for record in self.res['compliance']['data']:
+            if record['name'] == category:
+                for audit in record['audits']:
+                    if audit['type'] == type and 'id' in audit:
+                        delete_ids.append(str(audit['id']))
+
+        audit = {"audits": {"custom": {"delete": []}}}
+        if len(delete_ids) > 0:
+            audit["audits"]["custom"]["delete"] = delete_ids
+
+            self.action(action="policies/" + str(self.policy_id),
+                        method="put", extra=audit)
 
 ################################################################################
     def _policy_add_audit(self, category, filename):

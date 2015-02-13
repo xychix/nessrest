@@ -587,6 +587,52 @@ class Scanner(object):
         self.scan_id = self.res["scan"]["id"]
 
 ################################################################################
+    def scan_exists(self, name):
+        '''
+        Set existing scan.
+        '''
+        self.scan_name = name
+        self.action(action="scans", method="get")
+
+        for scan in self.res["scans"]:
+            if scan["name"] == name:
+                self.scan_id = scan["id"]
+                return True
+
+        return False
+
+################################################################################
+    def scan_update_targets(self, targets):
+        '''
+        After update targets on existing scan.
+        '''
+
+        # This makes the targets much more readable in the GUI, as it splits
+        # them out to "one per line"
+        text_targets = targets.replace(",", "\n")
+
+        self.targets = targets.replace(",", " ")
+
+        self.action(action="scans/" + str(self.scan_id), method="get")
+
+        #scan = {"uuid": self.scan_uuid}
+        scan = {}
+        settings = {}
+
+        # Static items- some could be dynamic, but it's overkill
+
+        # Dynamic items
+        settings.update({"name": self.scan_name})
+        settings.update({"policy_id": self.policy_id})
+        settings.update({"folder_id": self.tag_id})
+        settings.update({"text_targets": text_targets})
+
+        scan.update({"settings": settings})
+
+        self.action(action="scans/" + str(self.scan_id), method="put", extra=scan)
+
+
+################################################################################
     def scan_run(self):
         '''
         Start the scan and save the UUID to query the status

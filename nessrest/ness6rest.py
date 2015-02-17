@@ -594,10 +594,11 @@ class Scanner(object):
         self.scan_name = name
         self.action(action="scans", method="get")
 
-        for scan in self.res["scans"]:
-            if scan["name"] == name:
-                self.scan_id = scan["id"]
-                return True
+        if "scans" in self.res and self.res["scans"]:
+            for scan in self.res["scans"]:
+                if scan["name"] == name:
+                    self.scan_id = scan["id"]
+                    return True
 
         return False
 

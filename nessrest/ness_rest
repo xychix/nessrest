@@ -236,17 +236,20 @@ scan.policy_add(name=args.name, plugins=args.plugins, credentials=creds)
 if args.ports:
     scan.policy_add_ports(ports=args.ports)
 
-if not args.noscan:
+if args.noscan:
+    print("Policy name : " + scan.policy_name)
+    print("Invoked with '--noscan'. Policy created. Exiting without scanning.")
+    sys.exit(0)
 
-    if not args.targets:
-        print("No targets set!")
-        sys.exit(1)
+if not args.targets:
+    print("No targets set!")
+    sys.exit(1)
 
-    scan.scan_add(targets=args.targets)
-    scan.scan_run()
+scan.scan_add(targets=args.targets)
+scan.scan_run()
 
-    if args.detach:
-        print("Invoked with '--detach'. Login to the GUI for results.")
-        sys.exit(0)
+if args.detach:
+    print("Invoked with '--detach'. Login to the GUI for results.")
+    sys.exit(0)
 
-    scan.scan_results()
+scan.scan_results()

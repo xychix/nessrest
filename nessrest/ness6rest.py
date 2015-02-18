@@ -89,7 +89,7 @@ class Scanner(object):
         self.ca_bundle = ca_bundle
         self.insecure = insecure
 
-        if insecure:
+        if insecure and hasattr(requests, 'packages'):
             requests.packages.urllib3.disable_warnings()
 
         # Initial login to get our token for all subsequent transactions
@@ -258,6 +258,21 @@ class Scanner(object):
         self._enable_plugins()
 
 ################################################################################
+    def policy_exists(self, name):
+        '''
+        Set existing policy to use for a scan.
+        '''
+        self.policy_name = name
+        self.action(action="policies", method="get")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == name:
+                self.policy_id = policy["id"]
+                return True
+
+        return False
+
+################################################################################
     def policy_set(self, name):
         '''
         Set existing policy to use for a scan.
@@ -395,6 +410,29 @@ class Scanner(object):
                     extra=settings)
 
 ################################################################################
+    def _policy_remove_audits(self, category, type='custom'):
+        '''
+        Removes all audit files from the policy.
+        '''
+        delete_ids = []
+
+        self.action(action="editor/policy/" + str(self.policy_id),
+                    method="get")
+
+        for record in self.res['compliance']['data']:
+            if record['name'] == category:
+                for audit in record['audits']:
+                    if audit['type'] == type and 'id' in audit:
+                        delete_ids.append(str(audit['id']))
+
+        audit = {"audits": {"custom": {"delete": []}}}
+        if len(delete_ids) > 0:
+            audit["audits"]["custom"]["delete"] = delete_ids
+
+            self.action(action="policies/" + str(self.policy_id),
+                        method="put", extra=audit)
+
+################################################################################
     def _policy_add_audit(self, category, filename):
         '''
         Adds an audit file to the policy.
@@ -452,7 +490,7 @@ class Scanner(object):
 
         # Query the search interface to get the family information for the
         # plugin
-        for plugin in self.plugins.iterkeys():
+        for plugin in self.plugins.keys():
             self.action(action="editor/policy/" + str(self.policy_id) +
                         "/families?filter.search_type=and&" +
                         "filter.0.filter=plugin_id&filter.0.quality=eq&" +
@@ -547,6 +585,53 @@ class Scanner(object):
 
         # We use the id for building the "launch" URL
         self.scan_id = self.res["scan"]["id"]
+
+################################################################################
+    def scan_exists(self, name):
+        '''
+        Set existing scan.
+        '''
+        self.scan_name = name
+        self.action(action="scans", method="get")
+
+        if "scans" in self.res and self.res["scans"]:
+            for scan in self.res["scans"]:
+                if scan["name"] == name:
+                    self.scan_id = scan["id"]
+                    return True
+
+        return False
+
+################################################################################
+    def scan_update_targets(self, targets):
+        '''
+        After update targets on existing scan.
+        '''
+
+        # This makes the targets much more readable in the GUI, as it splits
+        # them out to "one per line"
+        text_targets = targets.replace(",", "\n")
+
+        self.targets = targets.replace(",", " ")
+
+        self.action(action="scans/" + str(self.scan_id), method="get")
+
+        #scan = {"uuid": self.scan_uuid}
+        scan = {}
+        settings = {}
+
+        # Static items- some could be dynamic, but it's overkill
+
+        # Dynamic items
+        settings.update({"name": self.scan_name})
+        settings.update({"policy_id": self.policy_id})
+        settings.update({"folder_id": self.tag_id})
+        settings.update({"text_targets": text_targets})
+
+        scan.update({"settings": settings})
+
+        self.action(action="scans/" + str(self.scan_id), method="put", extra=scan)
+
 
 ################################################################################
     def scan_run(self):
@@ -645,6 +730,39 @@ class Scanner(object):
         return kbs
 
 ################################################################################
+    def download_scan(self, export_format="nessus"):
+        running = True
+        counter = 0
+
+        self.action("scans/" + str(self.scan_id), method="get")
+        data = {'format': export_format}
+        self.action("scans/" + str(self.scan_id) + "/export",
+                                        method="post",
+                                        extra=data)
+
+        file_id = self.res['file']
+        print('Download for file id '+str(self.res['file'])+'.')
+        while running:
+            time.sleep(2)
+            counter += 2
+            self.action("scans/" + str(self.scan_id) + "/export/"
+                                            + str(file_id) + "/status",
+                                            method="get")
+            running = self.res['status'] != 'ready'
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            if counter % 60 == 0:
+                print("")
+
+        print("")
+
+        content = self.action("scans/" + str(self.scan_id) + "/export/"
+                              + str(file_id) + "/download",
+                              method="get",
+                              download=True)
+        return content
+
+################################################################################
     def scan_results(self):
         '''
         Get the list of hosts, then iterate over them and extract results
@@ -664,7 +782,7 @@ class Scanner(object):
             print("Target    : %s" % host["hostname"])
             print("----------------------------------------\n")
 
-            for plugin in self.plugins.iterkeys():
+            for plugin in self.plugins.keys():
                 self.action("scans/" + str(self.scan_id) + "/hosts/" +
                             str(host["host_id"]) + "/plugins/" + str(plugin),
                             method="get")

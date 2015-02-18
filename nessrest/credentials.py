@@ -73,6 +73,18 @@ class SshUserCert(SshPublicKey):
                       private_key_passphrase=private_key_passphrase)
 
 
+class AmazonAWS(object):
+    '''
+    Access ID and Secret for Amazon AWS
+    '''
+    category = "Cloud Services"
+    name = "Amazon AWS"
+
+    def __init__(self, access_key_id, secret_key):
+        self.access_key_id = access_key_id
+        self.secret_key = secret_key
+
+
 class Salesforce(object):
     '''
     Username and password for Salesforce.com.
@@ -97,3 +109,132 @@ class PaloAltoPANOS(object):
         self.password = password
         self.port = port
         self.verify_ssl = verify_ssl
+
+class RHEV(object):
+    '''
+    Username and password for a Red Hat Enterprise Virtualization
+    '''
+    category = "Miscellaneous"
+    name = "RHEV"
+
+    def __init__(self, username, password, port="443", verify_ssl=True):
+        self.username = username
+        self.password = password
+        self.port = port
+        self.verify_ssl = verify_ssl
+
+
+class IBMiSeries(object):
+    '''
+    Username and password for a IBM iSeries
+    '''
+    category = "Miscellaneous"
+    name = "IBM iSeries"
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+
+class VMwareVCenter(object):
+    '''
+    Username and password for a VMware vCenter
+    '''
+    category = "Miscellaneous"
+    name = "VMware vCenter SOAP API"
+
+    def __init__(self, username, password, host, https=True, port="443", verify_ssl=True):
+        self.username = username
+        self.password = password
+        self.host = host
+        self.port = port
+        self.https = https
+        self.verify_ssl = verify_ssl
+
+
+class VMwareESX(object):
+    '''
+    Username and password for VMware ESX
+    '''
+    category = "Miscellaneous"
+    name = "VMware ESX SOAP API"
+
+    def __init__(self, username, password, dont_verify_ssl=False):
+        self.username = username
+        self.password = password
+        self.dont_verify_ssl = dont_verify_ssl
+
+
+class Database(object):
+    '''
+    Does not provide complete credential information on its own. Create one of
+    its subclasses instead. The privilege escalation functions can be used on
+    any subclass.
+    '''
+    category = "Database"
+    name = "Database"
+
+    def __init__(self, username, password, port, type):
+        self.type = type
+        self.username = username
+        self.password = password
+        self.port = port
+
+
+class DB2(Database):
+    '''
+    Username and password for Database DB2
+    '''
+    def __init__(self, username, password, db_sid, port=50000):
+        super(DB2, self).__init__(username, password, port, "DB2")
+        self.db_sid = db_sid      # dbname
+
+
+class Oracle(Database):
+    '''
+    Username and password for Database Oracle
+    '''
+    def __init__(self, username, password, oracle_sid, port=1521, oracle_auth_type="SYSDBA"):
+        super(Oracle, self).__init__(username, password, port, "Oracle")
+        self.oracle_sid = oracle_sid      # sid
+        self.oracle_auth_type = oracle_auth_type      # SYSDBA, SYSOPER, NORMAL
+
+
+class MySQL(Database):
+    '''
+    Username and password for Database MySQL
+    '''
+    def __init__(self, username, password, port=3306):
+        super(MySQL, self).__init__(username, password, port, "MySQL")
+
+
+class PostgreSQL(Database):
+    '''
+    Username and password for Database PostgreSQL
+    '''
+    def __init__(self, username, password, port=5432):
+        super(PostgresSQL, self).__init__(username, password, port, "PostgresSQL")
+
+
+class SQLServer(Database):
+    '''
+    Username and password for Database SQL Server
+    '''
+    def __init__(self, username, password, db_sid="", port=1433, auth_type="SQL"):
+        super(SQLServer, self).__init__(username, password, port, "SQL Server")
+        self.db_sid = db_sid      # instance
+        self.sql_server_auth_type = auth_type      # SQL, Windows
+
+
+class MongoDB(object):
+    '''
+    Username and password for MongoDB
+    '''
+    category = "Database"
+    name = "MongoDB"
+
+    def __init__(self, username, password, database="admin", port=27017):
+        self.username = username
+        self.password = password
+        self.port = port
+        self.database = database      # admin

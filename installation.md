@@ -14,9 +14,9 @@ Installation
 In order to get Nessus Rest installed and take care of any dependencies, you need run the following:
 
 ### easy_install
-`$ sudo easy_install nessrest`
+  ```$ sudo easy_install nessrest```
 
 ### For those using pip
-`$ cd [your nessrest directory]`
-`$ pip install -r requirements.txt`
-`$ pip install nessrest`
+  ```$ cd [your nessrest directory]
+  $ pip install -r requirements.txt
+  $ pip install nessrest```

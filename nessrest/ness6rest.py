@@ -88,15 +88,28 @@ class Scanner(object):
         self.ver_web = ''
         self.ca_bundle = ca_bundle
         self.insecure = insecure
+        self.auth = []
 
         if insecure and hasattr(requests, 'packages'):
             requests.packages.urllib3.disable_warnings()
 
         # Initial login to get our token for all subsequent transactions
+        self._login(login, password)
+
+        # Register a call to the logout action automatically
+        atexit.register(self.action, action="session", method="delete", retry=False)
+
+################################################################################
+    def _login(self, login="", password=""):
+        seperator = '_:_'
+        if login and password:
+            self.auth = [login,password]
+
         self.action(action="session",
                     method="post",
-                    extra={"username": login, "password": password},
-                    private=True)
+                    extra={"username": self.auth[0], "password": self.auth[1]},
+                    private=True,
+                    retry=False)
 
         try:
             self.token = self.res["token"]
@@ -110,9 +123,6 @@ class Scanner(object):
         self._get_permissions()
         self._get_feed()
 
-        # Register a call to the logout action automatically
-        atexit.register(self.action, action="session", method="delete")
-
 ################################################################################
     def _get_permissions(self):
         '''
@@ -123,7 +133,7 @@ class Scanner(object):
         self.permissions = self.res['permissions']
 
 ################################################################################
-    def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False):
+    def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False, retry=True):
         '''
         Generic actions for REST interface. The json_req may be unneeded, but
         the plugin searching functionality does not use a JSON-esque request.
@@ -197,6 +207,13 @@ class Scanner(object):
             raise SSLException('%s for %s.' % (ssl_error, url))
         except requests.exceptions.ConnectionError:
             raise Exception("Could not connect to %s.\nExiting!\n" % url)
+
+        if self.res and "error" in self.res and retry:
+            if self.res["error"] == "You need to log in to perform this request":
+                self._login()
+                self.action(action=action, method=method, extra=extra, files=files,
+                            json_req=json_req, download=download, private=private,
+                            retry=False)
 
 
 ################################################################################

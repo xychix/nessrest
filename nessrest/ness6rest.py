@@ -101,7 +101,6 @@ class Scanner(object):
 
 ################################################################################
     def _login(self, login="", password=""):
-        seperator = '_:_'
         if login and password:
             self.auth = [login,password]
 

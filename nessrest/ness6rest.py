@@ -167,6 +167,8 @@ class Scanner(object):
 
             if not download and req.text:
                 self.res = req.json()
+            elif not req.text:
+                self.res = {}
 
             if req.status_code != 200:
                 print("*****************START ERROR*****************")

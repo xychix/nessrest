@@ -7,6 +7,11 @@
 * requests module (install via pip)
 * The dependencies can be satisfied via `pip install -r requirements.txt`
 
+### Quick Install
+```
+pip install nessrest
+```
+
 ### Features:
 
 * Logins
@@ -111,4 +116,4 @@ Note that this will disable invalid SSL cerficate errors and should be used with
 
 * To build a package to install via `pip` or `easy_install`, execute:
     * `python setup.py sdist`
-* The resulting build will be in `$PWD/dist/ness6rest-<version>.tar.gz`
+* The resulting build will be in `$PWD/dist/nessrest-<version>.tar.gz`

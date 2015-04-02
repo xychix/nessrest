@@ -1,5 +1,6 @@
 # ness6rest.py - a REST interface to Nessus 6
 [![Build Status](https://travis-ci.org/tenable/nessrest.svg?branch=master)](https://travis-ci.org/tenable/nessrest)
+[![PyPI Version](https://badge.fury.io/py/nessrest.svg)](https://pypi.python.org/pypi/nessrest)
 ### Dependencies:
 
 * Nessus 6.0.1

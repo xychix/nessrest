@@ -228,11 +228,12 @@ class Scanner(object):
         '''
         This is primarily for debugging and reporting.
         '''
-        self.action(action="server/properties", method="get")
-        self.ver_gui = self.res['nessus_ui_version']
-        self.ver_svr = self.res['server_version']
-        self.ver_feed = self.res['feed']
-        self.ver_plugins = self.res['loaded_plugin_set']
+        # self.action(action="server/properties", method="get")
+        # self.ver_gui = self.res['nessus_ui_version']
+        # self.ver_svr = self.res['server_version']
+        # self.ver_feed = self.res['feed']
+        # self.ver_plugins = self.res['loaded_plugin_set']
+        pass
 
 ################################################################################
     def policy_add(self, name, plugins, credentials=[], template="advanced"):

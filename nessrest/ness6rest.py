@@ -95,6 +95,8 @@ class Scanner(object):
 
         self.host_vulns = {}
         self.plugin_output = {}
+        self.host_details = {}
+        self.host_ids = {}
 
         # Initial login to get our token for all subsequent transactions
         self._login(login, password)
@@ -766,6 +768,33 @@ class Scanner(object):
             if self.scan_id not in self.host_vulns:
                 self.host_vulns[self.scan_id] = {}
             self.host_vulns[self.scan_id][host["host_id"]]=self.res
+
+################################################################################
+    def get_host_ids(self, name):
+        '''
+        List host_ids in given scan
+        '''
+
+        # Get details of requested scan
+        self.scan_details(name)
+
+        for host in self.res["hosts"]:
+            #print("%s" % host["host_id"])
+            self.host_ids[host["host_id"]]=1
+
+################################################################################
+    def get_host_details(self, scan_id, host_id):
+        '''
+        Fill in host_details dict with the host vulnerabilities found in a
+        scan
+        '''
+
+        # Get details of requested scan
+
+        self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id), method="get")
+        if host_id not in self.host_details:
+            self.host_details[scan_id] = {}
+        self.host_details[scan_id][host_id]=self.res
 
 ################################################################################
     def get_plugin_output(self, scan, plugin_id):

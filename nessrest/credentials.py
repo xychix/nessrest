@@ -213,7 +213,7 @@ class PostgreSQL(Database):
     Username and password for Database PostgreSQL
     '''
     def __init__(self, username, password, port=5432):
-        super(PostgresSQL, self).__init__(username, password, port, "PostgresSQL")
+        super(PostgreSQL, self).__init__(username, password, port, "PostgreSQL")
 
 
 class SQLServer(Database):

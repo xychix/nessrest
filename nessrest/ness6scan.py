@@ -45,7 +45,7 @@ class Scan(object):
         self._cache = {}
 
         if template:
-            set_scan_template(template)
+            self.set_scan_template(template)
 
         if self.scanner.scan_exists(name):
             self.get_scan_settings(self.scanner.scan_id)
